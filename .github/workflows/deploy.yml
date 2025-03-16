@@ -1,0 +1,32 @@
+name: Build and deploy on RPi runner
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: rpi
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t linguist-cards .
+
+      - name: Run linguist bots
+        env:
+          MOCHI_TOKEN: ${{ secrets.MOCHI_TOKEN }}
+          CHATGPT_TOKEN: ${{ secrets.CHATGPT_TOKEN }}
+          TELEGRAM_BOT_TOKEN_ENGLISH: ${{ secrets.TELEGRAM_BOT_TOKEN_ENGLISH }}
+          TELEGRAM_BOT_TOKEN_POLISH: ${{ secrets.TELEGRAM_BOT_TOKEN_POLISH }}
+        run: |
+          docker run -d --rm --name linguist-cards-english -e MOCHI_TOKEN -e CHATGPT_TOKEN \
+            -e TELEGRAM_BOT_TOKEN_ENGLISH linguist-cards english
+          docker run -d --rm --name linguist-cards-polish -e MOCHI_TOKEN -e CHATGPT_TOKEN \
+            -e TELEGRAM_BOT_TOKEN_POLISH linguist-cards polish
