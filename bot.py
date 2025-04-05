@@ -46,14 +46,14 @@ class TelegramBot:
             self.translation_data = reply
             await update.message.reply_text(reply.display_for_bot())
         except ValueError:
-            reply = "The word or phrase is incorrect"
+            reply = "The word or phrase is incorrect ❌"
             await update.message.reply_text(reply)
             return
 
         # Ask for confirmation after message processing
         keyboard = [
-            [InlineKeyboardButton("Yes", callback_data='yes')],
-            [InlineKeyboardButton("No", callback_data='no')],
+            [InlineKeyboardButton("Yes 👍", callback_data='yes')],
+            [InlineKeyboardButton("No 👎", callback_data='no')],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text("Add to Mochi cards?", reply_markup=reply_markup)
@@ -64,9 +64,9 @@ class TelegramBot:
         await query.answer()
         if query.data == "yes":
             add_to_mochi(self.translation_data, self.deck_name)
-            await query.edit_message_text("ADDED")
+            await query.edit_message_text("ADDED ✅")
         else:
-            await query.edit_message_text("NOT ADDED")
+            await query.edit_message_text("NOT ADDED ❌")
 
     # Define the main function to start the bot
     def main(self):
