@@ -28,9 +28,10 @@ class ChatGPTApiHelper(ChatGPTApiBase):
                                              "A - A brief explanation (<100 symbols) in the same language (only explanation, without `word is ...`).\n"
                                              "B - An example sentence using the word/phrase in that language.\n"
                                              "C - Word/phrase translation into Russian in the meaning used in sentence.\n"
-                                             "D - transcription .\n\n"
+                                             "D - Transcription.\n"
+                                             "E - One synonym\n\n"
                                              "The response format should be:\n"
-                                             "explanation: A\nexample: B\ntranslation: C\ntranscription: D\n"
+                                             "explanation: A\nexample: B\ntranslation: C\ntranscription: D\nsynonym: E\n\n"
                                              "If the word/phrase is incorrect, return one word 'False' in reply")},
             ],
             "max_tokens": CHATGPT_MAX_TOKEN

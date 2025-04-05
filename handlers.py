@@ -17,18 +17,19 @@ class TranslationData:
     example: str
     translation: str
     transcription: str
+    synonym: str
 
     def display_for_mochi(self):
         if self.language == ENGLISH:
-            return f"{self.explanation}\n\nEx: _{self.example}_\n\n[{self.transcription}]\n\n{self.translation}"
+            return f"{self.explanation}\n\nEx: _{self.example}_\n\n[{self.transcription}]\n\nSyn: {self.synonym}\n\n{self.translation}"
         else:
-            return f"{self.explanation}\n\nEx: _{self.example}_\n\n{self.translation}"
+            return f"{self.explanation}\n\nEx: _{self.example}_\n\nSyn: {self.synonym}\n\n{self.translation}"
 
     def display_for_bot(self):
         if self.language == ENGLISH:
-            return f"{self.explanation}\n\nEx: {self.example}\n\n[{self.transcription}]\n\n{self.translation}"
+            return f"{self.explanation}\n\nEx: {self.example}\n\n[{self.transcription}]\n\nSyn: {self.synonym}\n\n{self.translation}"
         else:
-            return f"{self.explanation}\n\nEx: {self.example}\n\n{self.translation}"
+            return f"{self.explanation}\n\nEx: {self.example}\n\nSyn: {self.synonym}\n\n{self.translation}"
 
 
 def ask_and_translate(word: str, language: str) -> TranslationData:
@@ -42,7 +43,7 @@ def ask_and_translate(word: str, language: str) -> TranslationData:
     reply = chatgpt.ask_for_translation(word)
     logger.info(f"Translation:\n{reply}")
 
-    explanation, example, translation, transcription = (i.split(":")[-1].strip() for i in reply.split("\n"))
+    explanation, example, translation, transcription, synonym = (i.split(":")[-1].strip() for i in reply.split("\n"))
     return TranslationData(
         word=word,
         language=language,
@@ -50,6 +51,7 @@ def ask_and_translate(word: str, language: str) -> TranslationData:
         example=example,
         translation=translation,
         transcription=transcription,
+        synonym=synonym,
     )
 
 
