@@ -24,7 +24,8 @@ jobs:
         run: docker build -t ${{ env.BOT_IMAGE_NAME }} .
 
       - name: Stop running bot containers
-        run: docker stop ${{ env.BOT_CONTAINER_NAME_EN }} ${{ env.BOT_CONTAINER_NAME_PL }} || true
+        run: |
+          docker rm -f ${{ env.BOT_CONTAINER_NAME_EN }} ${{ env.BOT_CONTAINER_NAME_PL }} || true
 
       - name: Run linguist bots
         env:
