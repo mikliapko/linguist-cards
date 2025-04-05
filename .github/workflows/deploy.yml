@@ -8,6 +8,10 @@ on:
 jobs:
   build-and-deploy:
     runs-on: rpi
+    env:
+      BOT_IMAGE_NAME: linguist-cards
+      BOT_CONTAINER_NAME_EN: linguist-cards-english
+      BOT_CONTAINER_NAME_PL: linguist-cards-polish
 
     steps:
       - name: Checkout code
@@ -17,7 +21,10 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Build Docker image
-        run: docker build -t linguist-cards .
+        run: docker build -t ${{ env.BOT_IMAGE_NAME }} .
+
+      - name: Stop running bot containers
+        run: docker stop ${{ env.BOT_CONTAINER_NAME_EN }} ${{ env.BOT_CONTAINER_NAME_PL }} || true
 
       - name: Run linguist bots
         env:
@@ -26,7 +33,7 @@ jobs:
           TELEGRAM_BOT_TOKEN_ENGLISH: ${{ secrets.TELEGRAM_BOT_TOKEN_ENGLISH }}
           TELEGRAM_BOT_TOKEN_POLISH: ${{ secrets.TELEGRAM_BOT_TOKEN_POLISH }}
         run: |
-          docker run -d --rm --name linguist-cards-english -e MOCHI_TOKEN -e CHATGPT_TOKEN \
-            -e TELEGRAM_BOT_TOKEN_ENGLISH linguist-cards english
-          docker run -d --rm --name linguist-cards-polish -e MOCHI_TOKEN -e CHATGPT_TOKEN \
-            -e TELEGRAM_BOT_TOKEN_POLISH linguist-cards polish
+          docker run -d --rm --name ${{ env.BOT_CONTAINER_NAME_EN }} -e MOCHI_TOKEN -e CHATGPT_TOKEN \
+            -e TELEGRAM_BOT_TOKEN_ENGLISH ${{ env.BOT_IMAGE_NAME }} english
+          docker run -d --rm --name ${{ env.BOT_CONTAINER_NAME_PL }} -e MOCHI_TOKEN -e CHATGPT_TOKEN \
+            -e TELEGRAM_BOT_TOKEN_POLISH ${{ env.BOT_IMAGE_NAME }} polish
