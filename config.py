@@ -1,5 +1,9 @@
 import os
 
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 MOCHI_URL = os.getenv("MOCHI_URL", "https://app.mochi.cards")
 MOCHI_TOKEN = os.getenv("MOCHI_TOKEN", None)
