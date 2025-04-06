@@ -14,6 +14,7 @@ class SQLiteConnector:
     def conn(self):
         if not self._conn:
             self._conn = sqlite3.connect(self.db_path)
+            self._conn.row_factory = sqlite3.Row
         return self._conn
 
     @property
@@ -65,3 +66,8 @@ class TranslationDbHandler(SQLiteConnector):
             f"UPDATE {self.table_name} SET is_added = ? WHERE id = ?",
             (1 if is_added else 0, self.last_row_id)
         )
+
+    def select_by_word(self, word: str) -> list:
+        self.execute(f"SELECT * FROM {self.table_name} WHERE word = ?", (word,))
+        rows = self.cursor.fetchall()
+        return [dict(row) for row in rows]  # Convert Row objects to dictionaries

@@ -43,6 +43,7 @@ class TelegramBot:
 
         try:
             reply = ask_and_translate(user_message, self.language)
+            searched_before = self.database.select_by_word(user_message)
             self.database.insert_translation(word=user_message, user_id=user_id)
             self.translation_data = reply
             await update.message.reply_text(reply.display_for_bot())
@@ -50,6 +51,15 @@ class TelegramBot:
             reply = "The word or phrase is incorrect ❌"
             await update.message.reply_text(reply)
             return
+
+        if searched_before:
+            if searched_before[0]["is_added"] == 1:
+                reply = "This word has been already searched before 🤪"
+                await update.message.reply_text(reply)
+                return
+            elif searched_before[0]["is_added"] == 0:
+                reply = "This word has been already searched before, but not added to Mochi cards 🧠"
+                await update.message.reply_text(reply)
 
         # Ask for confirmation after message processing
         keyboard = [
