@@ -88,7 +88,7 @@ class TelegramBot:
 if __name__ == "__main__":
     args = parse_arguments()
 
-    database = TranslationDbHandler("translations.db", args.language)
+    database = TranslationDbHandler("db/translations.db", args.language)
     database.init_table()
 
     bot = TelegramBot(

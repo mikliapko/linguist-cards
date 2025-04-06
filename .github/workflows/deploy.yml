@@ -12,6 +12,7 @@ jobs:
       BOT_IMAGE_NAME: linguist-cards
       BOT_CONTAINER_NAME_EN: linguist-cards-english
       BOT_CONTAINER_NAME_PL: linguist-cards-polish
+      DB_VOLUME_NAME: /home/pi/linguist_db
 
     steps:
       - name: Checkout code
@@ -34,7 +35,11 @@ jobs:
           TELEGRAM_BOT_TOKEN_ENGLISH: ${{ secrets.TELEGRAM_BOT_TOKEN_ENGLISH }}
           TELEGRAM_BOT_TOKEN_POLISH: ${{ secrets.TELEGRAM_BOT_TOKEN_POLISH }}
         run: |
-          docker run -d --rm --name ${{ env.BOT_CONTAINER_NAME_EN }} -e MOCHI_TOKEN -e CHATGPT_TOKEN \
-            -e TELEGRAM_BOT_TOKEN_ENGLISH ${{ env.BOT_IMAGE_NAME }} english
-          docker run -d --rm --name ${{ env.BOT_CONTAINER_NAME_PL }} -e MOCHI_TOKEN -e CHATGPT_TOKEN \
-            -e TELEGRAM_BOT_TOKEN_POLISH ${{ env.BOT_IMAGE_NAME }} polish
+          docker run -d --rm --name ${{ env.BOT_CONTAINER_NAME_EN }} \
+            -v ${{ env.DB_VOLUME_NAME }}:/app/db \
+            -e MOCHI_TOKEN -e CHATGPT_TOKEN -e TELEGRAM_BOT_TOKEN_ENGLISH \
+            ${{ env.BOT_IMAGE_NAME }} english
+          docker run -d --rm --name ${{ env.BOT_CONTAINER_NAME_PL }} \
+            -v ${{ env.DB_VOLUME_NAME }}:/app/db \
+            -e MOCHI_TOKEN -e CHATGPT_TOKEN -e TELEGRAM_BOT_TOKEN_POLISH \
+            ${{ env.BOT_IMAGE_NAME }} polish
