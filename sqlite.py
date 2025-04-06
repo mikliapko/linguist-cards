@@ -39,17 +39,29 @@ class TranslationDbHandler(SQLiteConnector):
         super().__init__(db_path)
         self.table_name = table_name
 
+    @property
+    def last_row_id(self) -> int:
+        return self.cursor.lastrowid
+
     def init_table(self):
         self.execute(
             f"""
-            CREATE TABLE IF NOT EXISTS {self.table_name} 
-            (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                date TEXT DEFAULT CURRENT_TIMESTAMP,
-                word TEXT NOT NULL
-            )
+                CREATE TABLE IF NOT EXISTS {self.table_name} 
+                (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    date TEXT DEFAULT CURRENT_TIMESTAMP,
+                    word TEXT NOT NULL,
+                    is_added INTEGER DEFAULT 0,
+                    user_id INTEGER NOT NULL
+                )
             """
         )
 
-    def insert(self, word: str):
-        self.execute(f"INSERT INTO {self.table_name} (word) VALUES (?)", (word,))
+    def insert_translation(self, word: str, user_id: int) -> None:
+        self.execute(f"INSERT INTO {self.table_name} (word, user_id) VALUES (?, ?)", (word, user_id))
+
+    def update_is_added_status(self,is_added: bool) -> None:
+        self.execute(
+            f"UPDATE {self.table_name} SET is_added = ? WHERE id = ?",
+            (1 if is_added else 0, self.last_row_id)
+        )

@@ -38,11 +38,12 @@ class TelegramBot:
         """Process and respond to a user message."""
         user_message = update.message.text  # Get the message text
         user_message = user_message[0].lower() + user_message[1:]  # Uncapitalize the first letter
+        user_id = update.message.from_user.id  # Get the user ID
         logger.info(f"Received message: {user_message}")
 
         try:
             reply = ask_and_translate(user_message, self.language)
-            self.database.insert(user_message)
+            self.database.insert_translation(word=user_message, user_id=user_id)
             self.translation_data = reply
             await update.message.reply_text(reply.display_for_bot())
         except ValueError:
@@ -64,6 +65,7 @@ class TelegramBot:
         await query.answer()
         if query.data == "yes":
             add_to_mochi(self.translation_data, self.deck_name)
+            self.database.update_is_added_status(is_added=True)
             await query.edit_message_text("ADDED ✅")
         else:
             await query.edit_message_text("NOT ADDED ❌")
