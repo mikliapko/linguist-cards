@@ -14,6 +14,14 @@ class MochiApiBase(ApiClientBase):
         body = {k.replace("_", "-"): v for k, v in params.items()}
         return self.request("POST", endpoint, body)
 
+    def get_cards(self, **filters) -> dict:
+        endpoint = "cards"
+        if filters:
+            filters = {k.replace("_", "-"): v for k, v in filters.items()}
+            endpoint += "?"
+            endpoint += "&".join([f"{k}={v}" for k, v in filters.items()])
+        return self.request("GET", endpoint)
+
 
 class MochiApiHelper(MochiApiBase):
     def __init__(self, base_url, token):
@@ -39,3 +47,20 @@ class MochiApiHelper(MochiApiBase):
             },
         }
         return self.create_card(content=content, deck_id=deck_id, fields=fields)
+
+    def get_cards_in_deck(self, deck_id: str) -> list[dict]:
+        cards = []
+        cards_left = True
+
+        _cards = self.get_cards(deck_id=deck_id, limit=100)
+        if _cards.get("docs", None):
+            cards.extend(_cards["docs"])
+
+            while cards_left:
+                _cards = self.get_cards(bookmark=_cards["bookmark"], limit=100)
+                if len(_cards["docs"]) > 0:
+                    cards.extend(_cards["docs"])
+                else:
+                    cards_left = False
+
+        return cards
