@@ -54,11 +54,11 @@ class TelegramBot:
 
         if translation_processor.searched_before:
             if translation_processor.added_to_mochi:
-                reply = "This word has been already searched before 🤪"
+                reply = "Searched before and added to Mochi 🤪"
                 await update.message.reply_text(reply)
                 return
             else:
-                reply = "This word has been already searched before, but not added to Mochi cards 🧠"
+                reply = "Searched before, but not added to Mochi 🧠"
                 await update.message.reply_text(reply)
 
         # Ask for confirmation after message processing
