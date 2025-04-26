@@ -52,7 +52,7 @@ class TelegramBot:
             await update.message.reply_text(reply)
             return
 
-        if searched_before:
+        if searched_before and searched_before[0]["user_id"] == user_id:
             if searched_before[0]["is_added"] == 1:
                 reply = "This word has been already searched before 🤪"
                 await update.message.reply_text(reply)
