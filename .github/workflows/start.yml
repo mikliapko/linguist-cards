@@ -1,0 +1,34 @@
+name: Start bot containers
+
+on:
+  workflow_dispatch:
+
+jobs:
+  start-bot:
+    runs-on: rpi
+    env:
+      BOT_IMAGE_NAME: linguist-cards
+      BOT_CONTAINER_NAME_EN: linguist-cards-english
+      BOT_CONTAINER_NAME_PL: linguist-cards-polish
+      DB_VOLUME_NAME: /home/pi/linguist_db
+
+    steps:
+      - name: Stop running bot containers
+        run: |
+          docker rm -f ${{ env.BOT_CONTAINER_NAME_EN }} ${{ env.BOT_CONTAINER_NAME_PL }} || true
+
+      - name: Start bot containers
+        env:
+          MOCHI_TOKEN: ${{ secrets.MOCHI_TOKEN }}
+          CHATGPT_TOKEN: ${{ secrets.CHATGPT_TOKEN }}
+          TELEGRAM_BOT_TOKEN_ENGLISH: ${{ secrets.TELEGRAM_BOT_TOKEN_ENGLISH }}
+          TELEGRAM_BOT_TOKEN_POLISH: ${{ secrets.TELEGRAM_BOT_TOKEN_POLISH }}
+        run: |
+          docker run -d --rm --name ${{ env.BOT_CONTAINER_NAME_EN }} \
+            -v ${{ env.DB_VOLUME_NAME }}:/app/db \
+            -e MOCHI_TOKEN -e CHATGPT_TOKEN -e TELEGRAM_BOT_TOKEN_ENGLISH \
+            ${{ env.BOT_IMAGE_NAME }} english
+          docker run -d --rm --name ${{ env.BOT_CONTAINER_NAME_PL }} \
+            -v ${{ env.DB_VOLUME_NAME }}:/app/db \
+            -e MOCHI_TOKEN -e CHATGPT_TOKEN -e TELEGRAM_BOT_TOKEN_POLISH \
+            ${{ env.BOT_IMAGE_NAME }} polish

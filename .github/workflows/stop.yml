@@ -1,0 +1,16 @@
+name: Stop bot containers
+
+on:
+  workflow_dispatch:
+
+jobs:
+  stop-bot:
+    runs-on: rpi
+    env:
+      BOT_CONTAINER_NAME_EN: linguist-cards-english
+      BOT_CONTAINER_NAME_PL: linguist-cards-polish
+
+    steps:
+      - name: Stop running bot containers
+        run: |
+          docker rm -f ${{ env.BOT_CONTAINER_NAME_EN }} ${{ env.BOT_CONTAINER_NAME_PL }} || true
