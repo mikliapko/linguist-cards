@@ -5,7 +5,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 
 from config import TELEGRAM_BOT_TOKEN_MAP
-from handlers import ask_and_translate, add_to_mochi
+from handlers import TranslationProcessor, add_to_mochi
 from sqlite import TranslationDbHandler
 
 
@@ -36,15 +36,15 @@ class TelegramBot:
 
     async def handle_message(self, update: Update, context) -> None:
         """Process and respond to a user message."""
-        user_message = update.message.text  # Get the message text
-        user_message = user_message[0].lower() + user_message[1:]  # Uncapitalize the first letter
-        user_id = update.message.from_user.id  # Get the user ID
-        logger.info(f"Received message: {user_message}")
+        translation_processor = TranslationProcessor(
+            message=update.message,
+            language=self.language,
+            database=self.database
+        )
+        logger.info(f"Received message: {translation_processor.word}")
 
         try:
-            reply = ask_and_translate(user_message, self.language)
-            searched_before = self.database.select_by_word(user_message)
-            self.database.insert_translation(word=user_message, user_id=user_id)
+            reply = translation_processor.ask_and_translate()
             self.translation_data = reply
             await update.message.reply_text(reply.display_for_bot())
         except ValueError:
@@ -52,12 +52,12 @@ class TelegramBot:
             await update.message.reply_text(reply)
             return
 
-        if searched_before and searched_before[0]["user_id"] == user_id:
-            if searched_before[0]["is_added"] == 1:
+        if translation_processor.searched_before:
+            if translation_processor.added_to_mochi:
                 reply = "This word has been already searched before 🤪"
                 await update.message.reply_text(reply)
                 return
-            elif searched_before[0]["is_added"] == 0:
+            else:
                 reply = "This word has been already searched before, but not added to Mochi cards 🧠"
                 await update.message.reply_text(reply)
 

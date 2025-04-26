@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from functools import cached_property
 
 import config
 from config import CHECK_INPUT_VALIDITY, ENGLISH
@@ -32,27 +33,59 @@ class TranslationData:
             return f"{self.explanation}\n\nEx: {self.example}\n\nSyn: {self.synonym}\n\n{self.translation}"
 
 
-def ask_and_translate(word: str, language: str) -> TranslationData:
-    logger.info(f"Ask ChatGPT for translation of '{word}'")
-    chatgpt = ChatGPTApiHelper(
-        base_url=config.CHATGPT_URL,
-        token=config.CHATGPT_TOKEN,
-        language=language,
-        check_validity=CHECK_INPUT_VALIDITY,
-    )
-    reply = chatgpt.ask_for_translation(word)
-    logger.info(f"Translation:\n{reply}")
+class TranslationProcessor:
+    def __init__(self, message, language, database):
+        self.message = message
+        self.language = language
+        self.database = database
+        self.searched_before = self.is_searched_before()
+        self.added_to_mochi = self.is_added_to_mochi()
 
-    explanation, example, translation, transcription, synonym = (i.split(":")[-1].strip() for i in reply.split("\n"))
-    return TranslationData(
-        word=word,
-        language=language,
-        explanation=explanation,
-        example=example,
-        translation=translation,
-        transcription=transcription,
-        synonym=synonym,
-    )
+    @cached_property
+    def user_id(self):
+        return self.message.from_user.id
+
+    @cached_property
+    def word(self):
+        _user_message = self.message.text
+        return _user_message[0].lower() + _user_message[1:]
+
+    def is_searched_before(self) -> bool:
+        rows = self.database.select_by_word(self.word)
+        if rows and rows[0]["user_id"] == self.user_id:
+            return True
+        return False
+
+    def is_added_to_mochi(self) -> bool:
+        rows = self.database.select_by_word(self.word)
+        if rows and rows[0]["is_added"] == 1:
+            return True
+        return False
+
+    def ask_and_translate(self) -> TranslationData:
+        logger.info(f"Ask ChatGPT for translation of '{self.word}'")
+        chatgpt = ChatGPTApiHelper(
+            base_url=config.CHATGPT_URL,
+            token=config.CHATGPT_TOKEN,
+            language=self.language,
+            check_validity=CHECK_INPUT_VALIDITY,
+        )
+        reply = chatgpt.ask_for_translation(self.word)
+        logger.info(f"Translation:\n{reply}")
+
+        self.database.insert_translation(word=self.word, user_id=self.user_id)
+
+        _fields = [i.split(":")[-1].strip() for i in reply.split("\n")]
+        explanation, example, translation, transcription, synonym = _fields
+        return TranslationData(
+            word=self.word,
+            language=self.language,
+            explanation=explanation,
+            example=example,
+            translation=translation,
+            transcription=transcription,
+            synonym=synonym,
+        )
 
 
 def add_to_mochi(translation: TranslationData, deck_name: str) -> None:
