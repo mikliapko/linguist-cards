@@ -29,6 +29,8 @@ class TelegramBot:
         self.deck_name = deck_name
         self.database = database
 
+        self.translation_processor = None
+
         self.user_message = None
         self.translation_data = None
         self.translation_message = None
@@ -48,15 +50,10 @@ class TelegramBot:
 
     async def _process_translation(self, update: Update) -> bool:
         """Process translation and update the message. Returns True if successful."""
-        translation_processor = TranslationProcessor(
-            message=self.user_message,
-            language=self.language,
-            database=self.database
-        )
-        logger.info(f"Received message: {translation_processor.word}")
+        logger.info(f"Received message: {self.translation_processor.word}")
 
         try:
-            self.translation_data = translation_processor.ask_and_translate()
+            self.translation_data = self.translation_processor.ask_and_translate()
             if self.translation_message:
                 await self.translation_message.edit_text(self.translation_data.display_for_bot())
             else:
@@ -68,19 +65,19 @@ class TelegramBot:
     async def handle_message(self, update: Update, context) -> None:
         """Process and respond to a user message."""
         self.user_message = update.message
+        self.translation_processor = TranslationProcessor(
+            message=self.user_message,
+            language=self.language,
+            database=self.database
+        )
+        self.translation_message = None
 
         if not await self._process_translation(update):
             await update.message.reply_text("The word or phrase is incorrect ❌")
             return
 
-        translation_processor = TranslationProcessor(
-            message=self.user_message,
-            language=self.language,
-            database=self.database
-        )
-
-        if translation_processor.searched_before:
-            if translation_processor.added_to_mochi:
+        if self.translation_processor.searched_before:
+            if self.translation_processor.added_to_mochi:
                 await update.message.reply_text("Searched before and added to Mochi 🤪")
                 return
             else:
