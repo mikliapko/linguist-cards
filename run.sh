@@ -8,8 +8,14 @@ ENGLISH_CONTAINER="linguist-cards-english"
 start_containers() {
     echo "Starting Docker containers..."
 
+    # Get the absolute path to the db directory
+    DB_DIR="$(pwd)/db"
+
     # Start Polish container
-    sudo docker run -d --rm --name "$POLISH_CONTAINER" --env-file .env linguist-cards polish
+    sudo docker run -d --rm --name "$POLISH_CONTAINER" \
+        --env-file .env \
+        -v "$DB_DIR:/app/db" \
+        linguist-cards polish
     if [ $? -eq 0 ]; then
         echo "✓ Started $POLISH_CONTAINER"
     else
@@ -17,7 +23,10 @@ start_containers() {
     fi
 
     # Start English container
-    sudo docker run -d --rm --name "$ENGLISH_CONTAINER" --env-file .env linguist-cards english
+    sudo docker run -d --rm --name "$ENGLISH_CONTAINER" \
+        --env-file .env \
+        -v "$DB_DIR:/app/db" \
+        linguist-cards english
     if [ $? -eq 0 ]; then
         echo "✓ Started $ENGLISH_CONTAINER"
     else
