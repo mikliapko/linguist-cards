@@ -18,6 +18,7 @@ class ChatGPTApiHelper(ChatGPTApiBase):
         self.language = language
         self.check_validity = check_validity
 
+    # ruff: noqa: E501
     def ask_for_translation(self, word: str) -> str:
         data = {
             "model": CHATGPT_MODEL,

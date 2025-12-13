@@ -47,7 +47,7 @@ class TranslationDbHandler(SQLiteConnector):
     def init_table(self):
         self.execute(
             f"""
-                CREATE TABLE IF NOT EXISTS {self.table_name} 
+                CREATE TABLE IF NOT EXISTS {self.table_name}
                 (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     date TEXT DEFAULT CURRENT_TIMESTAMP,

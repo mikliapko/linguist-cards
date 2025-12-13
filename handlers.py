@@ -22,15 +22,29 @@ class TranslationData:
 
     def display_for_mochi(self):
         if self.language == ENGLISH:
-            return f"{self.explanation}\n\nEx: _{self.example}_\n\n[{self.transcription}]\n\nSyn: {self.synonym}\n\n{self.translation}"
+            return (f"{self.explanation}\n\n"
+                    f"Ex: _{self.example}_\n\n"
+                    f"[{self.transcription}]\n\n"
+                    f"Syn: {self.synonym}\n\n"
+                    f"{self.translation}")
         else:
-            return f"{self.explanation}\n\nEx: _{self.example}_\n\nSyn: {self.synonym}\n\n{self.translation}"
+            return (f"{self.explanation}\n\n"
+                    f"Ex: _{self.example}_\n\n"
+                    f"Syn: {self.synonym}\n\n"
+                    f"{self.translation}")
 
     def display_for_bot(self):
         if self.language == ENGLISH:
-            return f"{self.explanation}\n\nEx: {self.example}\n\n[{self.transcription}]\n\nSyn: {self.synonym}\n\n{self.translation}"
+            return (f"{self.explanation}\n\n"
+                    f"Ex: {self.example}\n\n"
+                    f"[{self.transcription}]\n\n"
+                    f"Syn: {self.synonym}\n\n"
+                    f"{self.translation}")
         else:
-            return f"{self.explanation}\n\nEx: {self.example}\n\nSyn: {self.synonym}\n\n{self.translation}"
+            return (f"{self.explanation}\n\n"
+                    f"Ex: {self.example}\n\n"
+                    f"Syn: {self.synonym}\n\n"
+                    f"{self.translation}")
 
 
 class TranslationProcessor:
