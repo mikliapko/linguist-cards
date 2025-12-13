@@ -10,7 +10,7 @@ MOCHI_TOKEN = os.getenv("MOCHI_TOKEN", None)
 
 CHATGPT_URL = os.getenv("CHATGPT_URL", "https://api.openai.com")
 CHATGPT_TOKEN = os.getenv("CHATGPT_TOKEN", None)
-CHATGPT_MODEL = os.getenv("CHATGPT_MODEL", "gpt-4o-mini")
+CHATGPT_MODEL = os.getenv("CHATGPT_MODEL", "gpt-4o")
 CHATGPT_MAX_TOKEN = 100
 
 ENGLISH = "english"
