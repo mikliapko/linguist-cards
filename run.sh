@@ -65,15 +65,15 @@ stop_containers() {
 
 # Main script logic
 case "$1" in
-    run)
+    start)
         start_containers
         ;;
     stop)
         stop_containers
         ;;
     *)
-        echo "Usage: $0 {run|stop}"
-        echo "  run  - Start both linguist-cards containers (polish and english)"
+        echo "Usage: $0 {start|stop}"
+        echo "  start  - Start both linguist-cards containers (polish and english)"
         echo "  stop - Stop and remove both containers"
         exit 1
         ;;
