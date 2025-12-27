@@ -28,7 +28,7 @@ class ChatGPTApiHelper(ChatGPTApiBase):
                                              f"(no grammar or lexical mistakes). If it is correct, please provide:\n"
                                              "A - A brief explanation (<100 symbols) in the same language (only explanation, without `word is ...`).\n"
                                              "B - An example sentence using the word/phrase in that language.\n"
-                                             "C - Word/phrase translation into Russian with the reference to the meaning in A and B.\n"
+                                             "C - Word/phrase translation into Russian with the reference to the meaning in A and B (but without translation of the whole sentence or any mentioning of this sentence).\n"
                                              "D - Transcription.\n"
                                              "E - One synonym\n\n"
                                              "The response format should be:\n"
