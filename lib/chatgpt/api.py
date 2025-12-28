@@ -18,22 +18,26 @@ class ChatGPTApiHelper(ChatGPTApiBase):
         self.language = language
         self.check_validity = check_validity
 
-    # ruff: noqa: E501
     def ask_for_translation(self, word: str) -> str:
+        system_prompt = f"You are a helpful {self.language} language assistant."
+        user_prompt = (
+            f"For the word or phrase '{word}' in {self.language}, check validity "
+            f"(no grammar or lexical mistakes). If it is correct, please provide:\n"
+            "A - A brief explanation (<100 symbols) in the same language (only explanation, without `word is ...`).\n"
+            "B - An example sentence using the word/phrase in that language.\n"
+            "C - Translation of the word/phrase into Russian (based on meaning from A and B, not example sentence).\n"
+            "D - Transcription.\n"
+            "E - One synonym\n\n"
+            "The response format should be:\n"
+            "explanation: A\nexample: B\ntranslation: C\ntranscription: D\nsynonym: E\n\n"
+            "If the word/phrase is incorrect, return one word 'False' in reply"
+        )
+
         data = {
             "model": CHATGPT_MODEL,
             "messages": [
-                {"role": "system", "content": f"You are a helpful {self.language} language assistant."},
-                {"role": "user", "content": (f"For the word or phrase '{word}' in {self.language}, check validity"
-                                             f"(no grammar or lexical mistakes). If it is correct, please provide:\n"
-                                             "A - A brief explanation (<100 symbols) in the same language (only explanation, without `word is ...`).\n"
-                                             "B - An example sentence using the word/phrase in that language.\n"
-                                             "C - Word/phrase translation into Russian with the reference to the meaning in A and B (but without translation of the whole sentence or any mentioning of this sentence).\n"
-                                             "D - Transcription.\n"
-                                             "E - One synonym\n\n"
-                                             "The response format should be:\n"
-                                             "explanation: A\nexample: B\ntranslation: C\ntranscription: D\nsynonym: E\n\n"
-                                             "If the word/phrase is incorrect, return one word 'False' in reply")},
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
             ],
             "max_tokens": CHATGPT_MAX_TOKEN
         }
