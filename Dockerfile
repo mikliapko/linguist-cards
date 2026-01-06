@@ -17,4 +17,4 @@ RUN uv venv sync
 
 COPY . /app
 
-ENTRYPOINT ["uv", "run", "python", "bot.py", "-l"]
+ENTRYPOINT ["uv", "run", "python", "bot_translate_and_mochi.py", "-l"]
